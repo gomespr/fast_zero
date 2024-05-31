@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jwt import DecodeError, decode, encode
+from jwt import DecodeError, ExpiredSignatureError, decode, encode
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,9 +25,7 @@ def create_access_token(data: dict):
     )
     to_encode.update({'exp': expire})
     encoded_jwt = encode(
-        to_encode,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
 
     return encoded_jwt
@@ -56,15 +54,15 @@ async def get_current_user(
 
     try:
         payload = decode(
-            token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         username: str = payload.get('sub')
         if not username:
             raise credentials_exception
         token_data = TokenData(username=username)
     except DecodeError:
+        raise credentials_exception
+    except ExpiredSignatureError:
         raise credentials_exception
 
     user = session.scalar(

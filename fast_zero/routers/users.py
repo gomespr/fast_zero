@@ -25,7 +25,7 @@ def create_user(user: UserSchema, session: Session):
     if db_user:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail='Email already registered'
+            detail='Email already registered',
         )
 
     hashed_password = get_password_hash(user.password)
@@ -42,9 +42,7 @@ def create_user(user: UserSchema, session: Session):
 
 
 @router.get('/', response_model=UserList)
-def read_users(
-    session: Session, skip: int = 0, limit: int = 100
-):
+def read_users(session: Session, skip: int = 0, limit: int = 100):
     users = session.scalars(select(User).offset(skip).limit(limit)).all()
     return {'users': users}
 

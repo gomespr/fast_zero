@@ -20,18 +20,18 @@ def test_create_user(client):
     }
 
 
-def test_create_user_alredy_exists(client, user):
-    response = client.post(
-        '/users/',
-        json={
-            'username': 'Teste',
-            'email': 'teste@test.com',
-            'password': 'testtest',
-        },
-    )
-
-    assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json() == {'detail': 'Email already registered'}
+# def test_create_user_alredy_exists(client, user):
+#     response = client.post(
+#         '/users/',
+#         json={
+#             'username': f'{user.u}',
+#             'email': 'teste@test.com',
+#             'password': 'testtest',
+#         },
+#     )
+#
+#     assert response.status_code == HTTPStatus.BAD_REQUEST
+#     assert response.json() == {'detail': 'Email already registered'}
 
 
 def test_create_user_email_alredy_exists(client, user):
@@ -39,7 +39,7 @@ def test_create_user_email_alredy_exists(client, user):
         '/users/',
         json={
             'username': 'TesteEmail',
-            'email': 'teste@test.com',
+            'email': f'{user.email}',
             'password': 'testtest',
         },
     )
@@ -58,8 +58,8 @@ def test_read_users_by_id(client, user):
     response = client.get('/users/1')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'teste@test.com',
+        'username': f'{user.username}',
+        'email': f'{user.email}',
         'id': 1,
     }
 
@@ -94,9 +94,9 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_other_user(client, user, token):
+def test_update_user_with_wrong_user(client, other_user, token):
     response = client.put(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
@@ -118,9 +118,9 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_other_user(client, user, token):
+def test_delete_user_wrong_user(client, other_user, token):
     response = client.delete(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
