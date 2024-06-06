@@ -25,14 +25,7 @@ def test_create_todo(client, token):
             'state': 'draft',
         },
     )
-    # assert response.json() == {
-    #     'id': 1,
-    #     'title': 'Test todo',
-    #     'description': 'Test todo description',
-    #     'state': 'draft',
-    #     'created_at': str,
-    #     'updated_at': str,
-    # }
+
     assert response.json()['id'] == 1
     assert response.json()['title'] == 'Test todo'
     assert response.json()['description'] == 'Test todo description'
